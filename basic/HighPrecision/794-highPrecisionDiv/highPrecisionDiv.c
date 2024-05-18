@@ -19,6 +19,9 @@ void charArr2Num(Num *raw,  char *  charArr){
         if(charArr[index] >= '0' && charArr[index] <= '9')
             raw->bits[raw->length++] = charArr[index] - '0';
     }
+    while(raw->bits[raw->length - 1] == 0 && raw->length > 1){
+        raw->length--;
+    }
     raw->isNegative = false;
 }
 
@@ -187,25 +190,74 @@ void multiNum(Num *a, Num *b){
     copyNum(a, &result);
 }
 
+bool isEqualNum(Num *a, Num *b){
+    if(a->length == b->length){
+        for(int index = 0; index < a->length; index++){
+            if(a->bits[index] != b->bits[index]){
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 void divNum(Num *a, Num *b){
     if(isGreaterNum(a, b)){
         copyNum(b, a);
         charArr2Num(a, "0");
     }
     else {
+        Num rst;
+        charArr2Num(&rst, "0");
+
         int initTimes = a->length - b->length;
         char charArr[MAX_BIT];
-        charArr[0] = 1;
+        charArr[0] = '1';
         int len = 1;
         while(initTimes--){
-            charArr[len++] = 0;
+            charArr[len++] = '0';
         }
+        charArr[len++] = '\0';
+        Num base;
+        charArr2Num(&base, charArr);
 
-        Num min;
-        charArr2Num(&min, charArr);
-        Num max;
-        charArr[len] = 1;
-        charArr2Num(&max, charArr);
+        Num temp;
+
+        char rstArr[MAX_BIT];
+        for(int i = 0; i < MAX_BIT; i++){
+            rstArr[i] = '0';
+        }
+        int rstLen = 0;
+
+        while (base.length != 0){
+            copyNum(&temp, b);
+            multiNum(&temp, &base);
+
+            if(isGreaterNum(&temp, a)){
+                subNum(a, &temp);
+                rstArr[rstLen]++;
+            }
+            else if(isEqualNum(&temp, a)){
+                subNum(a, &temp);
+                rstArr[rstLen]++;
+                rstLen++;
+                base.length--;
+                if(base.length != 0){
+                    base.bits[base.length-1] = 1;
+                }
+            }
+            else{
+                rstLen++;
+                base.length--;
+                if(base.length != 0){
+                    base.bits[base.length-1] = 1;
+                }
+            }
+        }
+        rstArr[rstLen] = '\0';
+        copyNum(b, a);
+        charArr2Num(a, rstArr);
     }
 }
 
@@ -219,6 +271,9 @@ int main(){
     scanf("%s", charArr);
     charArr2Num(&b, charArr);
 
-    multiNum(&a, &b);
+    divNum(&a, &b);
     printNum(&a);
+    printf("\n");
+    printNum(&b);
+    printf("\n");
 }
