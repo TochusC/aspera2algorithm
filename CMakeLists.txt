@@ -1,1 +1,2 @@
-add_executable(new_target Part2-DataStructure/Trie/835-trieStringCount/trieStringCount.c)
+add_executable(new_target Part2-DataStructure/Trie/835-trieStringCount/trieStringCount.c
+        Part2-DataStructure/Trie/143-maximumXORPair/maximumXORPair.c)
