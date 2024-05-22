@@ -27,14 +27,9 @@ int same(int elmA, int elmB){
     return findPar(elmA) == findPar(elmB);
 }
 
-int mentioned[MAX];
-
 int main(){
     for(int i = 0; i < MAX * 3; i++)
         uni[i] = -1;
-
-    for(int i = 0; i < MAX; i++)
-        mentioned[i] = 0;
 
     int n, k;
     scanf("%d %d", &n, &k);
@@ -48,42 +43,23 @@ int main(){
             continue;
         }
         if(type == 1){
-            if(mentioned[elm1] && mentioned[elm2]) {
-                if (elm1 > n || elm2 > n || same(elm1, elm2 * 2) || same(elm1, elm2 * 3)) {
-                    ans++;
-                } else {
-                    merge(elm1, elm2);
-                    merge(elm1 * 2, elm2 * 2);
-                    merge(elm1 * 3, elm2 * 3);
-                }
-            }
-            else{
-                mentioned[elm1] = 1;
-                mentioned[elm2] = 1;
+            if (same(elm1, elm2 + n) || same(elm1, elm2 + n * 2)) {
+                ans++;
+            } else {
                 merge(elm1, elm2);
-                merge(elm1 * 2, elm2 * 2);
-                merge(elm1 * 3, elm2 * 3);
+                merge(elm1 + n, elm2 + n);
+                merge(elm1 + n * 2, elm2 + n * 2);
             }
         }
         else{
-            if(mentioned[elm1] && mentioned[elm2]) {
-                if(elm1 == elm2 || same(elm1, elm2)){
-                    ans++;
-                }
-                else{
-                    merge(elm1, elm2 *2);
-                    merge(elm1 * 2, elm2 * 3);
-                    merge(elm1 * 3, elm2);
-                }
+            if(elm1 == elm2 || same(elm1, elm2) || same(elm1, elm2 + n * 2)){
+                ans++;
             }
             else{
-                mentioned[elm1] = 1;
-                mentioned[elm2] = 1;
-                merge(elm1, elm2 *2);
-                merge(elm1 * 2, elm2 * 3);
-                merge(elm1 * 3, elm2);
+                merge(elm1, elm2 + n);
+                merge(elm1 + n, elm2 + n * 2);
+                merge(elm1 + n * 2, elm2);
             }
-
         }
     }
 
