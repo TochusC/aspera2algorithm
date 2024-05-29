@@ -43,11 +43,11 @@ int  main(){
     for(int k = 1; k < num; k++)
         for (int i = 1; i + k <= num; i++)
             for (int j = 0; j < k; j++) {
-                    if(dp[i][i + j] + dp[i + j + 1][i + k] <= dp[i][i + k]){
-                        dp[i][i + k] = dp[i][i + j] + dp[i + j + 1][i + k];
-                        cost[i][i + k] = min(cost[i][i + k], dp[i][i + k] + cost[i][i + j] + cost[i + j + 1][i + k]);
-                    }
+                if(dp[i][i + j] + dp[i + j + 1][i + k] <= dp[i][i + k]){
+                    dp[i][i + k] = dp[i][i + j] + dp[i + j + 1][i + k];
+                    cost[i][i + k] = min(cost[i][i + k], dp[i][i + k] + cost[i][i + j] + cost[i + j + 1][i + k]);
                 }
+            }
 
     printf("%d", cost[1][num]);
 }

@@ -1,7 +1,9 @@
 #include <cstdio>
 #include <utility>
 #include <queue>
+#include <list>
 #include <vector>
+#include <stack>
 #include <algorithm>
 
 using namespace std;
@@ -17,36 +19,32 @@ struct Droplet{
     bool operator<(const int & pos) const{
         return this->pos < pos;
     }
-    bool operator>(const Droplet & ano) const{
-        return this->pos < ano.pos;
-    }
 };
-vector<Droplet> dropVec;
+list<Droplet> dropList;
+stack<list<Droplet>::iterator> bombQue;
 
-queue<int> bombQue;
-void checkBomb(vector<Droplet>::iterator pos){
-    if(pos->num >= 5){
-        int loc = pos->pos;
-        dropVec.erase(pos);
+void bomb(){
+    while(!bombQue.empty()){
+        auto drop = bombQue.top();
+        bombQue.pop();
 
-        auto left = dropVec.end();
-        auto right = dropVec.end();
+        auto left = dropList.end();
+        auto right = ++drop;
+        drop--;
 
-        auto it = lower_bound(dropVec.begin(), dropVec.end(), loc);
-
-        if(it != dropVec.begin()){
-            left = it - 1;
-            left->num++;
-        }
-        if(it != dropVec.end()){
-            right = it;
-            right->num++;
+        if(drop != dropList.begin()) {
+            left = --drop;
+            drop++;
         }
 
-        if(left != dropVec.end())
-            checkBomb(left);
-        if(right != dropVec.end())
-            checkBomb(right);
+//        printf("ERASED! %d\n", drop->pos);
+        dropList.erase(drop);
+//        printf("Left: %d, right: %d\n", left->pos, right->pos);
+
+        if(right != dropList.end())
+            if(++right->num == 5) bombQue.push(right);
+        if(left != dropList.end())
+            if(++(left->num) == 5) bombQue.push(left);
     }
 }
 
@@ -57,20 +55,22 @@ int main(){
     int pos, num;
     while(m--){
         scanf("%d %d", &pos, &num);
-        dropVec.emplace_back(pos, num);
+        auto it = lower_bound(dropList.begin(), dropList.end(), pos);
+        dropList.insert(it, Droplet(pos, num));
     }
-    sort(dropVec.begin(), dropVec.end());
     while(n--){
         scanf("%d", &pos);
-        auto it = lower_bound(dropVec.begin(), dropVec.end(), pos);
-        if(it == dropVec.end() || it->pos != pos)
-            dropVec.insert(it, {pos, 1});
+        auto it = lower_bound(dropList.begin(), dropList.end(), pos);
+        if(it == dropList.end() || it->pos != pos)
+            dropList.insert(it, {pos, 1});
         else if(it->pos == pos) {
-            it->num++;
-            checkBomb(it);
+            if(++it->num ==5){
+                bombQue.push(it);
+                bomb();
+            }
         }
-        printf("%d\n", dropVec.size());
-//        for(auto &e:dropVec)
+        printf("%d\n", dropList.size());
+//        for(auto &e:dropList)
 //            printf("%d %d\n", e.pos, e.num);
 //        printf("\n");
     }
